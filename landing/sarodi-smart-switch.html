@@ -126,15 +126,16 @@ button{font:inherit;color:inherit}
 .pmark{position:absolute;top:7%;right:7%;writing-mode:vertical-rl;font:500 calc(var(--size,250px) * .046)/1 var(--f-display);letter-spacing:.02em;opacity:.92}
 .keys{position:absolute;inset:0;display:grid;place-items:center;padding:16%}
 .keys.row{grid-auto-flow:column;grid-auto-columns:1fr}
-.keys.grid{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;padding:19%}
+.keys.grid{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;padding:15%}
 .key{all:unset;cursor:pointer;width:min(64px,26%);aspect-ratio:1;display:grid;place-items:center;border-radius:50%;transition:transform 120ms var(--ease);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.keys.grid .key{width:min(70px,52%)}
-.keys.row .key{width:min(64px,82%)}
+.keys.grid .key{width:min(76px,62%);min-width:44px}
+.keys.row .key{width:min(68px,86%)}
+#mPanel .key,#heroPanel .key{min-width:44px}
 .key:active{transform:scale(.94)}
 .key:focus-visible{outline:2px solid var(--light);outline-offset:2px}
 .key svg{width:100%;height:100%;overflow:visible}
 .key .ring{opacity:0;transition:opacity .3s ease}
-.key[aria-pressed="true"] .ring{opacity:1}
+.key[aria-pressed="true"] .ring,.key[data-on] .ring{opacity:1}
 .key[aria-pressed="true"] .glyph{color:#FFE7C2}
 .panel.white .key[aria-pressed="true"] .glyph{filter:none}
 .panel.static .key{cursor:default;pointer-events:none}
@@ -186,6 +187,7 @@ td.us .cell{color:var(--fg)}
 .app-row.on{border-color:rgb(244 184 96 / .35);background:linear-gradient(90deg,rgb(244 184 96 / .10),var(--bg-3))}
 .app-row span{font-size:15px}
 .app-row small{display:block;font-size:12.5px;color:var(--muted)}
+.tgl::before{content:"";position:absolute;inset:-8px -2px}
 .tgl{position:relative;width:48px;height:28px;border-radius:var(--r-pill);background:#2A2D33;border:0;cursor:pointer;flex:none;transition:background-color .25s ease}
 .tgl::after{content:"";position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:#E9E9E6;transition:transform .3s var(--ease)}
 .tgl[aria-pressed="true"]{background:var(--light)}
@@ -329,8 +331,7 @@ input::placeholder,textarea::placeholder{color:#7D8189}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--light);box-shadow:0 0 0 3px rgb(244 184 96 / .18)}
 input[aria-invalid="true"]{border-color:#E5877F}
 .help{font-size:13px;color:var(--muted)}
-.err{font-size:13px;color:#F2A49C}
-.err:empty{display:none}
+.err{font-size:13px;line-height:1.5;color:#F2A49C;min-height:1.5em} /* reserved: no layout jump when an error clears on blur */
 .pick{display:flex;flex-wrap:wrap;gap:8px}
 .pick label{position:relative;font-weight:500}
 .pick input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;min-height:0}
@@ -817,10 +818,10 @@ footer a:hover{color:var(--fg)}
     el.innerHTML='<span class="pmark" aria-hidden="true">sarodi</span><div class="keys '+model.layout+'"></div>';
     var box=el.querySelector('.keys');
     var btns=model.keys.map(function(k,i){
-      var b=document.createElement('button');b.className='key';b.type='button';
-      if(o.static){b.tabIndex=-1;}
-      b.setAttribute('aria-pressed',o.on&&o.on[i]?'true':'false');
-      b.setAttribute('aria-label',(o.labels&&o.labels[i])||k.a||('پل '+(i+1)));
+      var b=document.createElement(o.static?'span':'button');b.className='key';
+      if(!o.static){b.type='button';}
+      if(!o.static){b.setAttribute('aria-pressed',o.on&&o.on[i]?'true':'false');}else if(o.on&&o.on[i]){b.setAttribute('data-on','');}
+      b.setAttribute(o.static?'data-label':'aria-label',(o.labels&&o.labels[i])||k.a||('پل '+(i+1)));
       b.innerHTML=glyph(k);
       b.addEventListener('click',function(){
         var on=b.getAttribute('aria-pressed')!=='true';
